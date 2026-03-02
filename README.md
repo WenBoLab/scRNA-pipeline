@@ -266,6 +266,324 @@ p_umap <- dittoDimPlot(
 
 <img width="443" height="358" alt="image" src="https://github.com/user-attachments/assets/ba6d65dc-8b85-4586-b443-02b9710508c0" />
 
+## When analyzing multiple cell groups with RNA-seq
+### 1.Data Loading and Seurat Object Creation
+
+Load raw expression matrix and create a Seurat object, the primary data structure for single-cell RNA-seq analysis.
+
+```bash
+suppressPackageStartupMessages({
+  library(Seurat)
+  library(stringr) 
+  library(readr)
+  library(ggplot2)
+  library(harmony)
+  library(dplyr)
+  library(clustree)
+})
+path <- file.path("~", "test_sclc", "GSE281740_sclc_cellranger (1).csv.gz")
+df <- read_csv(file = path)
+expr_matrix <- as.data.frame(df)
+rownames(expr_matrix) <- expr_matrix$feature_name
+expr_matrix <- expr_matrix[, -1]          
+expr_matrix <- as.matrix(expr_matrix)
+sclc <- CreateSeuratObject(
+  counts = expr_matrix, 
+  project = "SCLC"
+)
+sclc@meta.data$orig.ident <- stringr::str_split(
+  rownames(sclc@meta.data), "-", simplify = TRUE
+)[, 3]
+```
+
+### 2.Quality Control Metrics Calculation
+
+Calculate quality metrics such as mitochondrial and ribosomal gene percentages to identify low-quality cells.
+
+```bash
+sclc[["percent.mt"]] <- PercentageFeatureSet(sclc, pattern = "^MT-")
+rb.genes <- rownames(sclc)[grep("^RP[SL]", rownames(sclc))]
+C <- GetAssayData(object = sclc, layer = "counts")
+percent.ribo <- Matrix::colSums(C[rb.genes, ]) / Matrix::colSums(C) * 100
+sclc <- AddMetaData(sclc, percent.ribo, col.name = "percent.ribo")
+v1 <- VlnPlot(sclc, 
+              features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.ribo"), 
+              pt.size = 0)
+print(v1)
+v2 <- VlnPlot(sclc, 
+              features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.ribo"), 
+              group.by = 'orig.ident', 
+              pt.size = 0)
+print(v2)
+
+<img width="883" height="388" alt="image" src="https://github.com/user-attachments/assets/51d6df16-ee19-498a-af35-53a3a43417c8" />
+
+<img width="855" height="385" alt="image" src="https://github.com/user-attachments/assets/3742b4fc-bee7-4ba0-be90-8fe35c5c1a2e" />
+
+```
+
+### 3.Cell Filtering
+
+Filter low-quality cells based on QC metrics.
+
+```bash
+sclc <- subset(sclc, 
+               subset = nFeature_RNA > 200 &    
+                        nFeature_RNA < 7500 &   
+                        percent.mt < 15)       
+```
+
+### 4.Data Normalization and Feature Selection
+
+Normalize count data and identify highly variable genes for downstream analysis.
+
+```bash
+sclc <- NormalizeData(sclc, 
+                      normalization.method = "LogNormalize", 
+                      scale.factor = 10000)
+sclc <- FindVariableFeatures(sclc, 
+                             selection.method = "vst", 
+                             nfeatures = 2000)
+features <- VariableFeatures(object = sclc)
+sclc <- ScaleData(sclc, features = features)
+```
+
+### 5.Dimensionality Reduction (PCA)
+
+Perform linear dimensionality reduction to capture major sources of variation.
+
+```bash
+sclc <- RunPCA(sclc, npcs = 50, features = features)
+e <- ElbowPlot(sclc, ndims = ncol(Embeddings(sclc, "pca")))
+print(e)
+```
+
+<img width="867" height="399" alt="image" src="https://github.com/user-attachments/assets/c0ec746e-8fac-4bbb-a7ce-872359f9be69" />
+
+### 6.Batch Effect Correction (Harmony)
+
+Correct batch effects between samples using Harmony algorithm.
+
+```bash
+sclc <- RunHarmony(sclc, 
+                   group.by.vars = "orig.ident",  # Correct by original sample ID
+                   dims.use = 1:30, 
+                   max_iter = 50)
+```
+
+### 7.Clustering and Non-linear Dimensionality Reduction
+
+Build SNN graph
+
+```bash
+sclc <- FindNeighbors(sclc, reduction = "harmony", dims = 1:30)
+```
+
+Graph-based clustering
+
+```bash
+sclc <- FindClusters(sclc, resolution = 1, algorithm = 3)
+```
+
+t-SNE dimensionality reduction
+
+```bash
+sclc <- RunTSNE(object = sclc, reduction = "harmony", dims = 1:30)
+```
+
+UMAP dimensionality reduction
+
+```bash
+sclc <- RunUMAP(sclc, reduction = "harmony", dims = 1:30)
+```
+
+### 8.Clustering Results Visualization
+
+Visualize UMAP dimensionality reduction results, colored by cluster and sample.
+
+```bash
+p1 <- DimPlot(sclc, 
+              reduction = "umap", 
+              group.by = "seurat_clusters", 
+              label = TRUE, 
+              repel = TRUE) + 
+  ggtitle("Single Cell Clustering UMAP")
+ggsave("~/test_sclc/Single_Cell_Clustering_UMAP.pdf", p1, width = 10, height = 8)
+p2 <- DimPlot(sclc, 
+              reduction = "umap", 
+              group.by = "orig.ident", 
+              label = TRUE, 
+              repel = TRUE) + 
+  ggtitle("Single Cell Clustering UMAP (Colored by Sample)")
+ggsave("~/test_sclc/Single_Cell_Clustering_Sample_UMAP.pdf", p2, width = 10, height = 8)
+```
+
+<img width="1003" height="788" alt="image" src="https://github.com/user-attachments/assets/12acdb64-d278-4948-a875-8d045fa1247b" />
+
+<img width="935" height="736" alt="image" src="https://github.com/user-attachments/assets/afdc58b5-6d44-40c5-bee3-d419691eaf7b" />
+
+### 9. Marker Gene Definition
+
+Define canonical marker gene sets for major cell types.
+
+```bash
+sclc_markers <- list(
+  EPCAM = c("EPCAM", "KRT19", "KRT7", "KRT18"),          
+  fibroblasts = c("ACTA2", "COL1A2"),                      
+  endothelial = c("ENG", "VWF"),                            
+  All_Immune = "PTPRC",                                    
+  B_cell = c("BANK1", "CD19", "CD79A", "CD79B", "MS4A1"),   
+  T_cell = c("CD3D", "CD3E", "CD8A", "CD4", "CD2"),         
+  NK = c("GNLY", "NKG7", "FGFBP2", "KLRF1"),                
+  Dendritic_cell = c("CLEC9A", "CD1C", "THBD", "ITGAX", "FLT3", 
+                      "IDO1", "FCER1A", "HLA-DQA1", "LAMP3", "CCR7", "FSCN1"), 
+  proliferative = c("MKI67", "PCNA", "TK1", "TOP2A", "TUBB", "TYMS"),
+  Myeloid = c("CD68", "CD14", "HLA-DRA", "HLA-DRB1", "APOE", "MMP9", 
+               "CTSK", "FCN1", "S100A9", "S100A8", "FCGR3A", "LST1", "LILRB2"),
+  Mast = c("KIT", "TPSAB1", "CPA3"),                        
+  pDC = c("LILRA4", "UGCG", "CLEC4C", "GZMB", "IL3RA"),      
+  plasma = c("SDC1", "CD38", "SLAMF7", "DERL3", "MZB1", "IGHA1", "IGHA2") 
+```
+
+### 10.Marker Gene DotPlot Visualization
+
+Create DotPlot to visualize expression patterns of marker genes across clusters.
+
+```bash
+cat(" -> Generating SCLC marker gene DotPlot...\n")
+p_dot <- DotPlot(sclc, 
+                 features = unique(unlist(sclc_markers)), 
+                 assay = "RNA",                             
+                 group.by = "seurat_clusters") + 
+  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  coord_flip()                                                
+ggsave("~/test_sclc/SCLC_Detailed_Marker_Gene_DotPlot.pdf", 
+       p_dot, width = 16, height = 20)
+```
+
+<img width="624" height="778" alt="image" src="https://github.com/user-attachments/assets/9cc403db-5255-4a23-a399-7ab616adfb76" />
+
+### 11. Gene Expression Feature Plots
+
+Visualize expression of marker genes on UMAP plots.
+
+```bash
+reduction_type <- "umap"
+for (cell_type in names(sclc_markers)) {
+  # Skip single-gene cell types to avoid too few subplots
+  if (length(sclc_markers[[cell_type]]) > 1) {
+    p <- FeaturePlot(sclc, 
+                     features = sclc_markers[[cell_type]],
+                     reduction = reduction_type,
+                     ncol = 3,                              
+                     cols = c("lightblue", "red"))
+    ggsave(paste0("~/test/SCLC_", cell_type, "_FeaturePlot.pdf"),
+           p, width = 12, height = 4 * ceiling(length(sclc_markers[[cell_type]])/3))
+  }
+}
+```
+<img width="1169" height="549" alt="image" src="https://github.com/user-attachments/assets/12e340d2-f99b-4127-8a95-a215f8e1b71e" />
+
+<img width="1103" height="723" alt="image" src="https://github.com/user-attachments/assets/7ca1a2a0-4f1b-45dd-993e-86bf3be33b6a" />
+
+<img width="1086" height="320" alt="image" src="https://github.com/user-attachments/assets/51d391b5-39aa-440c-bec2-6723ad114ad2" />
+
+<img width="1026" height="732" alt="image" src="https://github.com/user-attachments/assets/82fc7f92-f93b-4cbc-94bd-2a4e9421542d" />
+
+### 12.Cell Type Annotation
+
+Annotate clusters based on marker gene expression patterns.
+
+```bash
+cluster_annotation <- c(
+  "0" = "EPCAM", "1" = "EPCAM", "2" = "T_cell", "3" = "proliferative",
+  "4" = "proliferative", "5" = "T_cell", "6" = "proliferative", "7" = "Myeloid",
+  "8" = "proliferative", "9" = "EPCAM", "10" = "EPCAM", "11" = "Myeloid",
+  "12" = "NK", "13" = "proliferative", "14" = "EPCAM", "15" = "proliferative",
+  "16" = "plasma", "17" = "fibroblasts", "18" = "B_cell", "19" = "EPCAM",
+  "20" = "EPCAM", "21" = "endothelial", "22" = "EPCAM", "23" = "EPCAM",
+  "24" = "T_cell", "25" = "proliferative", "26" = "EPCAM", "27" = "proliferative",
+  "28" = "EPCAM", "29" = "EPCAM", "30" = "Mast", "31" = "EPCAM",
+  "32" = "EPCAM", "33" = "proliferative"
+)
+sclc$celltype <- as.character(sclc$seurat_clusters)
+for (cluster in names(cluster_annotation)) {
+  if (cluster %in% sclc$seurat_clusters) {
+    sclc$celltype[sclc$seurat_clusters == cluster] <- cluster_annotation[cluster]
+  }
+}
+sclc$celltype[!sclc$celltype %in% cluster_annotation] <- "Unknown"
+```
+
+### 13.Annotated UMAP Visualization
+
+Create publication-quality UMAP plots with cell type annotations.
+
+```bash
+Biocols <- c('#F1BB72', '#F3B1A0', '#E95C59', '#E59CC4', '#F7F398', '#E5D2DD',
+             '#57C3F3', '#BD956A', '#8C549C', '#476D87', '#23452F', '#585658',
+             '#D6E7A3', '#CCC9E6', '#9FA3A8', '#E0D4CA', '#5F3D69', '#C5DEBA',
+             '#58A4C3', '#E4C755', '#AA9A59', '#E63863', '#E39A35', '#C1E6F3',
+             '#6778AE', '#91D0BE', '#B53E2B', '#712820', '#DCC1DD', '#CCE0F5',
+             '#625D9E', '#68A180', '#3A6963', '#968175', '#AB3282', '#53A85F')
+p <- DimPlot(sclc, 
+             reduction = reduction_type,
+             label = TRUE, 
+             repel = TRUE,                       
+             group.by = "celltype", 
+             cols = Biocols) +
+  ggtitle("SCLC Annotated Cell Types (UMAP)") +
+  theme(plot.title = element_text(hjust = 0.5))   # Center title
+ggsave("~/test_sclc/SCLC_annotated_umap.pdf", p, width = 8, height = 6)
+```
+
+<img width="1012" height="754" alt="image" src="https://github.com/user-attachments/assets/084e4680-5e9d-4153-b95f-c698edd68063" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
