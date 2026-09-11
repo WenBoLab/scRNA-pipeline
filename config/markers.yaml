@@ -1,0 +1,10 @@
+# 人 PBMC 教学用阳性 marker 面板。用于提出候选标签，不是参考图谱或分类器。
+# 来源与判读方法见 docs/03_annotation.md。
+T cells: [CD3D, CD3E, TRAC, IL7R]
+B cells: [MS4A1, CD79A, CD79B, CD37]
+NK cells: [GNLY, NKG7, PRF1, KLRD1]
+CD14 monocytes: [CD14, LYZ, S100A8, S100A9]
+FCGR3A monocytes: [FCGR3A, MS4A7, LST1, IFITM3]
+Dendritic cells: [FCER1A, CD1C, CST3, CLEC10A]
+Platelets: [PPBP, PF4, GNG11, SDPR]
+

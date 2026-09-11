@@ -1,0 +1,10 @@
+sample_id,cluster,n_cells
+pbmc3k,0,453
+pbmc3k,1,717
+pbmc3k,2,327
+pbmc3k,3,207
+pbmc3k,4,418
+pbmc3k,5,158
+pbmc3k,6,279
+pbmc3k,7,33
+pbmc3k,8,15

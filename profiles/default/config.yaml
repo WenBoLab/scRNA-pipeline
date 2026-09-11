@@ -1,0 +1,4 @@
+# Snakemake 9.26+ supports database-backed metadata and locks.
+# Keep completion state in a transactional database rather than temporary marker files.
+persistence-backend: db
+persistence-backend-db-url: sqlite:///.snakemake/metadata.sqlite

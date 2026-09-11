@@ -1,0 +1,4 @@
+sample_id	path	format	donor	condition	batch
+# sample_A	data/raw/sample_A/filtered_feature_bc_matrix	10x_mtx	donor_A	control	batch1
+# sample_B	data/raw/sample_B/filtered_feature_bc_matrix.h5	10x_h5	donor_B	treated	batch1
+

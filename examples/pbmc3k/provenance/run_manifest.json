@@ -1,0 +1,110 @@
+{
+  "created_at_utc": "2026-09-09T03:09:33.433203+00:00",
+  "python": "3.12.14",
+  "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+  "versions": {
+    "scrna-seq-learning": "0.1.0",
+    "scanpy": "1.11.5",
+    "anndata": "0.12.3",
+    "numpy": "2.2.6",
+    "pandas": "2.2.3",
+    "scipy": "1.15.3",
+    "numba": "0.61.2",
+    "igraph": "0.11.9",
+    "snakemake": "9.26.1",
+    "pydeseq2": "0.5.2"
+  },
+  "config": {
+    "project": "pbmc3k",
+    "seed": 0,
+    "output_dir": "results/pbmc3k",
+    "input": {
+      "mode": "demo",
+      "path": "data/raw/pbmc3k_counts.h5ad",
+      "samples": "config/samples.tsv"
+    },
+    "qc": {
+      "min_genes": 200,
+      "max_genes": 2500,
+      "max_pct_mt": 5.0,
+      "min_cells_per_gene": 3,
+      "mitochondrial_prefix": "MT-",
+      "sample_overrides": {}
+    },
+    "doublets": {
+      "enabled": true,
+      "remove": true,
+      "expected_rate": 0.04,
+      "threshold": null
+    },
+    "normalization": {
+      "target_sum": 10000,
+      "n_hvg": 2000
+    },
+    "embedding": {
+      "n_pcs": 40,
+      "n_neighbors": 15,
+      "resolution": 1.0,
+      "tsne": true,
+      "integration": "none",
+      "batch_key": "batch"
+    },
+    "annotation": {
+      "markers": "config/markers.yaml",
+      "manual_labels": null,
+      "minimum_score": 0.1,
+      "minimum_margin": 0.08
+    },
+    "markers": {
+      "min_log2fc": 0.25,
+      "max_adjusted_p": 0.05
+    },
+    "enrichment": {
+      "gmt": "resources/reactome_2022.gmt",
+      "min_genes": 5,
+      "max_genes": 500,
+      "top_n": 200
+    }
+  },
+  "git_commit": "uncommitted",
+  "git_dirty": true,
+  "inputs": {
+    "samples": [
+      {
+        "sample_id": "pbmc3k",
+        "n_cells": 2700,
+        "n_genes": 32738,
+        "files": {
+          "data/raw/pbmc3k_counts.h5ad": "f8b708c02cb9fd81bfd30bc14c88b5d62549394cedadd487323f8cc7bae6f47e"
+        }
+      }
+    ],
+    "shared_genes": 32738,
+    "dataset_source": {
+      "dataset": "PBMC3k",
+      "provider": "10x Genomics",
+      "dataset_page": "https://www.10xgenomics.com/datasets/3-k-pbm-cs-from-a-healthy-donor-1-standard-1-1-0",
+      "download_url": "https://falexwolf.de/data/pbmc3k_raw.h5ad",
+      "mirror": "Scanpy pbmc3k raw-count mirror",
+      "sha256": "f8b708c02cb9fd81bfd30bc14c88b5d62549394cedadd487323f8cc7bae6f47e",
+      "original_download_sha256": "89a96f1beaa2dd83a687666d3f19a4513ac27a2a2d12581fcd77afed7ea653a1",
+      "packaging": "Lossless repack of verified stage-01 raw UMI counts; original barcodes restored; no QC or normalization applied",
+      "license": "CC BY 4.0",
+      "checked_at_utc": "2026-09-09T03:07:43.159620+00:00"
+    }
+  },
+  "lock_sha256": "97092efaa5d6d5439032be6d98582d4b47d0d3928b14b29d6dd436a77c624d8d",
+  "source_sha256": {
+    "/workspace/scratch/7db5f5cc1c24/scrna-seq-learning/src/scrna_learn/__init__.py": "1db8e0acc06855f81660fe52d37952c9e14f330d9d31f376baaac468ba894b1b",
+    "/workspace/scratch/7db5f5cc1c24/scrna-seq-learning/src/scrna_learn/analysis.py": "54c6f5c3e4caa626edae20f74feaae45a06be39e5bcb46f597696d641f363803",
+    "/workspace/scratch/7db5f5cc1c24/scrna-seq-learning/src/scrna_learn/cli.py": "d9da631a7e17457a7eac4b7eecc0efa099598411c6ec52b3d0e23f8cda1adaeb",
+    "/workspace/scratch/7db5f5cc1c24/scrna-seq-learning/src/scrna_learn/common.py": "e7cacb5749113004caaf283f3c73237cea901aa7448d7ef11bdd418ef3cb004d",
+    "/workspace/scratch/7db5f5cc1c24/scrna-seq-learning/src/scrna_learn/data.py": "93bbc9114cc254fe070c4755af960b6ad42e73c025641e4c6883c2083e67ee82",
+    "/workspace/scratch/7db5f5cc1c24/scrna-seq-learning/src/scrna_learn/extensions.py": "60850c2664526ac6cd89354065ef8fcb357ea389d31c4d2cf3818af99bfd0547",
+    "/workspace/scratch/7db5f5cc1c24/scrna-seq-learning/src/scrna_learn/report.py": "15ef4c0627fd4bd58ba60229ee66a040f6a68253ddeb7e69045ba39cc6de432e"
+  },
+  "workflow_sha256": {
+    "Snakefile": "13672d663321f941c10df94d1886aa5f166224fa553a5acd99a3e0ec38ecbabe",
+    "profiles/default/config.yaml": "18d23207900745c3ac659d7e6f6267dd874ed936285e896928b4208bb85e1892"
+  }
+}

@@ -1,0 +1,10 @@
+cluster,n_cells,candidate_cell_type,top_panel,runner_up,score,margin,t_lineage_fraction,present_markers,missing_markers,annotation_status
+0,453,T cells,T cells,Platelets,0.12613460311300181,0.16009780387453698,0.7604856512141281,CD3D;CD3E;IL7R,TRAC,candidate_requires_review
+1,717,T cells,T cells,Platelets,0.27056091681683914,0.30921957573356823,0.8605299860529987,CD3D;CD3E;IL7R,TRAC,candidate_requires_review
+2,327,B cells,B cells,Platelets,1.8928458209941876,1.92746653889268,0.07186544342507645,MS4A1;CD79A;CD79B;CD37,,candidate_requires_review
+3,207,FCGR3A monocytes,FCGR3A monocytes,CD14 monocytes,1.6936698754396597,0.8772797641430107,0.09903381642512077,FCGR3A;MS4A7;LST1;IFITM3,,candidate_requires_review
+4,418,CD14 monocytes,CD14 monocytes,FCGR3A monocytes,2.8696408553214736,2.3609239807042317,0.08492822966507176,CD14;LYZ;S100A8;S100A9,,candidate_requires_review
+5,158,NK cells,NK cells,Platelets,2.509946597648572,2.5612016163423443,0.27531645569620256,GNLY;NKG7;PRF1;KLRD1,,candidate_requires_review
+6,279,T/NK unresolved,NK cells,T cells,0.7666269367527364,0.627217203620799,0.7939068100358422,GNLY;NKG7;PRF1;KLRD1,,candidate_requires_review
+7,33,Dendritic cells,Dendritic cells,CD14 monocytes,1.6469515323372228,0.8722919926954668,0.13636363636363635,FCER1A;CD1C;CST3;CLEC10A,,candidate_requires_review
+8,15,Platelets,Platelets,CD14 monocytes,4.463896184959667,4.152407340644456,0.1,PPBP;PF4;GNG11;SDPR,,candidate_requires_review

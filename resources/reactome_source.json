@@ -1,0 +1,10 @@
+{
+  "provider": "Maayan Lab Enrichr",
+  "database": "Reactome_2022",
+  "url": "https://maayanlab.cloud/Enrichr/geneSetLibrary?mode=text&libraryName=Reactome_2022",
+  "retrieved_on": "2026-09-08",
+  "sha256": "cfe1adc75aa3137ba74c1b35a3098e88ea1708b204e5edfd788092b7ef5c08f8",
+  "gene_sets": 1818,
+  "underlying_data_license": "Reactome CC0",
+  "license_url": "https://reactome.org/license"
+}
