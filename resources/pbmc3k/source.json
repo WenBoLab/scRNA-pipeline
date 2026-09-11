@@ -1,0 +1,19 @@
+{
+  "dataset": "10x Genomics PBMC3k",
+  "cells": 2700,
+  "genes": 32738,
+  "total_umi": 6390631,
+  "nonzero_entries": 2286884,
+  "files": {
+    "matrix.mtx.gz": "784a57d16140501ad59b5eb48573223050fc420f00fc7443b33f9eba9014b857",
+    "features.tsv.gz": "9074fcd1aeca0240b7401be9cc807c378024b6b0acc9154d2c037ce7cbaa0bec",
+    "barcodes.tsv.gz": "fa3c8ea709ec5645be2d9ffc5d2ef1f3d40d9bacfd28fdea043411f683148dca"
+  },
+  "conversion": "Lossless R hdf5r/Matrix conversion of verified raw counts to 10x MTX; exact matrix and identifier equality checked after Seurat Read10X",
+  "source_h5ad_sha256": "f8b708c02cb9fd81bfd30bc14c88b5d62549394cedadd487323f8cc7bae6f47e",
+  "original_download_url": "https://falexwolf.de/data/pbmc3k_raw.h5ad",
+  "original_download_sha256": "89a96f1beaa2dd83a687666d3f19a4513ac27a2a2d12581fcd77afed7ea653a1",
+  "dataset_page": "https://www.10xgenomics.com/datasets/3-k-pbm-cs-from-a-healthy-donor-1-standard-1-1-0",
+  "license": "CC BY 4.0",
+  "converted_on_utc": "2026-09-10 08:25:44 UTC"
+}

@@ -1,0 +1,54 @@
+{
+  "implementation": "R / Seurat",
+  "input_cells": 2700,
+  "retained_cells": 2542,
+  "retained_genes": 13522,
+  "clusters": 9,
+  "raw_count_equality": true,
+  "complete_cell_audit": true,
+  "resumed_stages": [
+    {
+      "stage": "ingest",
+      "status": "cached",
+      "elapsed_seconds": 0.0009744167327881
+    },
+    {
+      "stage": "qc",
+      "status": "cached",
+      "elapsed_seconds": 0.0002660751342773
+    },
+    {
+      "stage": "normalize",
+      "status": "cached",
+      "elapsed_seconds": 0.0003044605255127
+    },
+    {
+      "stage": "reduce",
+      "status": "cached",
+      "elapsed_seconds": 0.0002565383911133
+    },
+    {
+      "stage": "markers",
+      "status": "cached",
+      "elapsed_seconds": 0.0002956390380859
+    },
+    {
+      "stage": "annotate",
+      "status": "cached",
+      "elapsed_seconds": 0.0003056526184082
+    },
+    {
+      "stage": "enrich",
+      "status": "cached",
+      "elapsed_seconds": 0.0002439022064209
+    },
+    {
+      "stage": "report",
+      "status": "cached",
+      "elapsed_seconds": 0.0002152919769287
+    }
+  ],
+  "python_runtime_initialized": false,
+  "r_version": "4.4.3",
+  "validated_at_utc": "2026-09-11 03:00:14 UTC"
+}

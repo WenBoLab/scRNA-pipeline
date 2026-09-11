@@ -1,0 +1,6 @@
+{
+  "status": "completed",
+  "tested_pathways": 8353,
+  "significant_pathways": 142,
+  "multiple_testing": "BH over every eligible pathway within each cluster"
+}

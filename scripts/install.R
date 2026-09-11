@@ -1,0 +1,11 @@
+# Run from the project root, in RStudio or with Rscript.
+if (!file.exists("scrna-seq-learning.Rproj")) stop("Open the RStudio project first.")
+if (getRversion() < "4.4.0") stop("Install R 4.4.3 before restoring this project.")
+options(timeout = max(600, getOption("timeout")), repos = c(CRAN = "https://cloud.r-project.org"))
+if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+if (!file.exists("renv.lock")) stop("renv.lock is missing; download the complete project.")
+renv::restore(project = getwd(), prompt = FALSE)
+renv::load(project = getwd())
+source("scripts/bootstrap.R")
+check_packages()
+message("Installation complete. Run source('run_pipeline.R') to start the demo.")

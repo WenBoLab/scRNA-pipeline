@@ -1,0 +1,27 @@
+# Optional Linux bootstrap. Activate it, then restore renv.lock with scripts/install.R.
+name: scrna-learning-r
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.4.3
+  - r-seurat=5.2.1
+  - r-seuratobject=5.0.2
+  - bioconductor-scdblfinder=1.20.2
+  - bioconductor-deseq2=1.46.0
+  - r-harmony=1.2.4
+  - r-ggplot2=3.5.2
+  - r-hdf5r
+  - r-renv
+  - r-testthat
+  - r-withr
+  - r-rmarkdown
+  - r-knitr
+  - r-jsonlite
+  - r-digest
+  - r-base64enc
+  - c-compiler
+  - cxx-compiler
+  - fortran-compiler
+  - make
+  - pandoc

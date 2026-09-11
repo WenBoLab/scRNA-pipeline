@@ -1,0 +1,13 @@
+{
+  "implementation": "R / Seurat",
+  "input_cells": 2700,
+  "retained_cells": 2542,
+  "retained_genes": 13522,
+  "clusters": 9,
+  "predicted_doublets_before_final_qc": 96,
+  "final_counts_total_umi": 5867141,
+  "doublet_detection": true,
+  "integration": "none",
+  "annotation_status": "candidate",
+  "python_runtime_initialized": false
+}

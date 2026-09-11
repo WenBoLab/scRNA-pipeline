@@ -1,0 +1,8 @@
+{
+  "implementation": "R",
+  "tests": 13,
+  "failed_expectations": 0,
+  "errored_tests": 0,
+  "r_version": "4.4.3",
+  "scope": "Unit checks plus explicitly synthetic end-to-end, Harmony and donor-level DESeq2 tests"
+}

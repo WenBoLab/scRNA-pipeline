@@ -1,0 +1,9 @@
+"stage","status","elapsed_seconds"
+"ingest","cached",0.000974416732788086
+"qc","cached",0.000266075134277344
+"normalize","cached",0.000304460525512695
+"reduce","cached",0.000256538391113281
+"markers","cached",0.000295639038085938
+"annotate","cached",0.000305652618408203
+"enrich","cached",0.000243902206420898
+"report","cached",0.000215291976928711
