@@ -1,2 +1,0 @@
-sample_id,path,format,donor,condition,batch
-pbmc3k,resources/pbmc3k,10x_mtx,donor1,healthy,batch1
