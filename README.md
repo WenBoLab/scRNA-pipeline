@@ -1,4 +1,4 @@
-# scRNA-seq Pipeline for GSE178481 (ccRCC)
+# scRNA-seq Pipeline 
 
 A reproducible single-cell RNA-seq analysis pipeline for renal clear cell carcinoma (ccRCC) dataset **GSE178481**, built on [Seurat](https://satijalab.org/seurat/) and following standard best practices.
 
