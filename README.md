@@ -393,57 +393,64 @@ After running `main.R`, the `results/` directory will contain:
 - Mitochondrial percentage
 - Ribosomal percentage
 
-![QC Violin Plot](results/gse178481/07_qc_violin_by_cluster.png)
+<img width="1138" height="805" alt="image" src="https://github.com/user-attachments/assets/b2c2556a-e954-4fdd-bb2e-87cb2f71deb1" />
+
 
 ### Marker Gene Heatmap
 
 Top 10 differentially expressed genes per cluster:
 
-![Marker Heatmap](results/gse178481/09_marker_heatmap.png)
+<img width="1126" height="1508" alt="image" src="https://github.com/user-attachments/assets/12ba615d-3826-4ba5-aea8-713d22a57e51" />
 
 ### Cell Type Marker Feature Plots
 
 **Epithelial cells (EPCAM, KRT19, KRT7, KRT18):**
 
-![Epithelial Feature Plot](results/gse178481/10_Epithelial_feature_plot.png)
+<img width="1228" height="818" alt="image" src="https://github.com/user-attachments/assets/28879586-34c9-4281-861d-6665d9888caf" />
 
 **T cells (CD3D, CD3E, CD8A, CD4):**
 
-![T cells Feature Plot](results/gse178481/10_T_cells_feature_plot.png)
+<img width="1230" height="820" alt="image" src="https://github.com/user-attachments/assets/82240c7b-9350-4155-ae69-450295f35dc6" />
+
 
 **Macrophages (CD68, CD14, APOE):**
 
-![Macrophage Feature Plot](results/gse178481/10_Macrophage_feature_plot.png)
+<img width="1231" height="819" alt="image" src="https://github.com/user-attachments/assets/e8070a99-2f7c-4e1a-94cf-a70812eb0465" />
 
 **Endothelial cells (ENG, VWF):**
 
-![Endothelial Feature Plot](results/gse178481/10_Endothelial_feature_plot.png)
+<img width="1230" height="819" alt="image" src="https://github.com/user-attachments/assets/c56aab06-d973-4e98-8492-42011649c939" />
 
 **NK cells (GNLY, NKG7, FGFBP2):**
 
-![NK cells Feature Plot](results/gse178481/10_NK_cells_feature_plot.png)
+<img width="1229" height="820" alt="image" src="https://github.com/user-attachments/assets/1a48386c-b089-4049-8c10-60b320618533" />
+
 
 **B cells (CD19, CD79A, MS4A1):**
 
-![B cells Feature Plot](results/gse178481/10_B_cells_feature_plot.png)
+<img width="1230" height="819" alt="image" src="https://github.com/user-attachments/assets/6ac9386b-21c5-4916-82f0-111fe7e913a7" />
 
 **Fibroblasts (ACTA2, COL1A2):**
 
-![Fibroblast Feature Plot](results/gse178481/10_Fibroblast_feature_plot.png)
+<img width="1228" height="819" alt="image" src="https://github.com/user-attachments/assets/9b5030a6-ed48-4450-943d-8ed3c57f0535" />
 
 **Plasma cells (SDC1, CD38, MZB1):**
 
-![Plasma cells Feature Plot](results/gse178481/10_Plasma_feature_plot.png)
+<img width="1228" height="820" alt="image" src="https://github.com/user-attachments/assets/2d7a57e4-d85f-41d2-ad99-9ebbbaa13556" />
+
 
 ### PCA & Dimensionality Reduction
 
-![PCA Plot](results/gse178481/04_pca_plot.png)
+<img width="763" height="574" alt="image" src="https://github.com/user-attachments/assets/4b07a938-4236-4d26-9ee9-e639757b5f50" />
 
-![Elbow Plot](results/gse178481/03_elbow_plot.png)
+
+<img width="1015" height="609" alt="image" src="https://github.com/user-attachments/assets/26bff905-23a0-49a8-a9ba-ad8ad84c2a1a" />
+
 
 ### Variable Features
 
-![HVG Plot](results/gse178481/02_variable_features.png)
+<img width="1023" height="613" alt="image" src="https://github.com/user-attachments/assets/34f8e8be-34c3-40e4-b624-4cc10a5e3017" />
+
 
 ---
 
