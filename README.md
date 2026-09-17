@@ -1,5 +1,4 @@
-# scRNA-seq Pipeline for GSE178481 (ccRCC)
-
+# scRNA-seq Pipeline
 A reproducible single-cell RNA-seq analysis pipeline for renal clear cell carcinoma (ccRCC) dataset **GSE178481**, built on [Seurat](https://satijalab.org/seurat/) and following standard best practices.
 
 ---
@@ -78,11 +77,9 @@ scRNA-seq-pipeline/
 │   ├── FastDoubletFinder.R
 │   ├── FastSeuratRNA.R
 │   └── FastPlotVlnPlot.R
-├── data/                        # Raw data (not tracked in Git)
 ├── results/
 │   └── gse178481/               # Example output figures (committed to Git)
 ├── main.R                       # ★ Self-contained main script: wrapper functions + actual run
-├── demo_run.R                   # Tiny self-test on Seurat's pbmc_small (no download needed)
 ├── README.md                    # This file
 └── .gitignore                   # Git ignore rules
 ```
@@ -153,9 +150,9 @@ BiocManager::install("dittoSeq")
 
 ---
 
-## Pipeline Steps (with actual output figures)
+## Pipeline Steps
 
-All figures below were produced by running `run_gse178481.R` on the **RCC-PR6-PTumor** sample (3,577 raw cells → 3,555 filtered cells → 15 clusters).
+All figures below were produced by running `main.R` on the **RCC-PR6-PTumor** sample (3,577 raw cells → 3,555 filtered cells → 15 clusters).
 
 ### Step 1: Create Seurat Object
 
@@ -197,96 +194,86 @@ sce <- qc_result$sce
 
 QC metrics before filtering (to inspect outliers):
 
-![QC violin before filtering](results/gse178481/01_qc_violin_before_filtering.png)
+<img width="1057" height="881" alt="image" src="https://github.com/user-attachments/assets/7cad5cde-a697-4053-bacd-1a3fc77ac642" />
+
 
 ---
 
-### Step 3: Normalization & Variable Features
+### Step 3: Main Analysis
 
 ```r
-sce <- NormalizeData(sce, normalization.method = "LogNormalize", scale.factor = 10000)
-sce <- FindVariableFeatures(sce, selection.method = "vst", nfeatures = 2000)
-
+result <- FastSeuratRNA(
+  obj = sce,
+  species = "human",
+  pcSelect = 30,
+  nfeatures = 2000,
+  resolution = 0.8,
+  harmony = FALSE,       # ！Notably,As the present dataset comprises only a single sample, harmony integration was not performed. For datasets containing multiple samples, harmony = TURE
+  doublet = TURE,       
+  cellCycle = TRUE,
+  isMarkers = TRUE,
+  algorithm = 3          
+)
+sce         <- result$sce
+sce.markers <- result$gene.markers
+# Highly variable features
 top10 <- head(VariableFeatures(sce), 10)
-p_hvg <- VariableFeaturePlot(sce)
-p_hvg <- LabelPoints(plot = p_hvg, points = top10, repel = TRUE)
+p_hvg <- LabelPoints(plot = VariableFeaturePlot(sce), points = top10, repel = TRUE)
+
+# Elbow plot (returned by the wrapper)
+result$e
+
+# PCA (PC1 vs PC2), UMAP, tSNE
+DimPlot(sce, reduction = "pca", dims = c(1, 2))
+DimPlot(sce, reduction = "umap")
+DimPlot(sce, reduction = "tsne")
 ```
 
-- Log-normalizes counts with a scale factor of 10,000
-- Selects the top 2,000 highly variable genes using the VST method
+-Internally this runs the standard Seurat workflow:
+-NormalizeData(LogNormalize, scale.factor = 10000) — log-normalizes counts
+-FindVariableFeatures(vst, nfeatures = 2000) — selects the top 2,000 highly variable genes
+-ScaleData + RunPCA(npcs = 50) — scales the variable features and computes 50 PCs
+-CellCycleScoring — adds S / G2M phase scores
+-FindNeighbors(dims = 1:30) → FindClusters(resolution = 0.8, algorithm = 3) — KNN graph + SLM clustering
+-RunTSNE / RunUMAP — projects onto tSNE and UMAP embeddings
+-FindAllMarkers(wilcox) — marker genes per cluster, returned as result$gene.markers
 
-![Highly variable features](results/gse178481/02_variable_features.png)
-
----
-
-### Step 4: Scaling & PCA
-
-```r
-sce <- ScaleData(sce, features = VariableFeatures(sce))
-sce <- RunPCA(sce, npcs = 50, features = VariableFeatures(sce))
-
-p_elbow <- ElbowPlot(sce, ndims = 50)
-p_pca   <- DimPlot(sce, reduction = "pca", dims = c(1, 2))
-```
-
-- Scales the variable features (mean-centering + scaling to unit variance)
-- Computes 50 principal components
-- The Elbow plot helps choose how many PCs to keep (we use 30 downstream)
+<img width="1016" height="609" alt="image" src="https://github.com/user-attachments/assets/33048571-13da-4673-830a-fffb3548c9f2" />
 
 Elbow plot:
 
-![Elbow plot](results/gse178481/03_elbow_plot.png)
+<img width="996" height="597" alt="image" src="https://github.com/user-attachments/assets/ddc3d27c-ae13-4dba-b76e-1494c2227ebf" />
+
 
 PCA projection (PC1 vs PC2):
 
-![PCA plot](results/gse178481/04_pca_plot.png)
-
----
-
-### Step 5: Clustering, UMAP & tSNE
-
-```r
-pcSelect <- 30
-
-sce <- FindNeighbors(sce, dims = 1:pcSelect)
-sce <- FindClusters(sce, resolution = 0.8, algorithm = 3)   # SLM
-sce <- RunUMAP(sce, dims = 1:pcSelect)
-sce <- RunTSNE(sce, dims = 1:pcSelect)
-```
-
-- Builds a KNN graph on PCs 1–30
-- Communities detected with the SLM algorithm at resolution 0.8
-- Projects onto UMAP and tSNE embeddings
-- **Result**: 15 clusters
+<img width="765" height="574" alt="image" src="https://github.com/user-attachments/assets/1aa01af3-15f7-436d-8d4e-bb1d6834fa93" />
 
 UMAP (colored by cluster):
 
-![UMAP clusters](results/gse178481/05_umap_clusters.png)
+<img width="982" height="749" alt="image" src="https://github.com/user-attachments/assets/23dfc4af-678e-4b64-ac98-4d8070cbca8c" />
 
 tSNE (colored by cluster):
 
-![tSNE clusters](results/gse178481/06_tsne_clusters.png)
+<img width="980" height="753" alt="image" src="https://github.com/user-attachments/assets/8a0cde46-73e3-420d-b94b-af9a1684a65c" />
 
 ---
 
-### Step 6: QC Violin Plot by Cluster
+### Step 4: QC Violin Plot by Cluster
 
 ```r
-p_ncount  <- VlnPlot(sce, features = 'nCount_RNA', pt.size = 0, log = TRUE)
-p_nfeature<- VlnPlot(sce, features = 'nFeature_RNA', pt.size = 0, log = TRUE)
-p_pctmt   <- VlnPlot(sce, features = 'percent.mt', pt.size = 0)
-p_pctribo <- VlnPlot(sce, features = 'percent.ribo', pt.size = 0)
-
-p_qc_combined <- plot_grid(p_ncount, p_nfeature, p_pctmt, p_pctribo, nrow = 2)
+p_qc <- FastPlotVlnPlot(sce)
+ggsave(file.path("results/gse178481", "07_qc_violin_by_cluster.pdf"), p_qc, width = 8, height = 12)
 ```
 
 Checks that no cluster has suspiciously high mitochondrial content or extreme feature counts:
 
-![QC violin by cluster](results/gse178481/07_qc_violin_by_cluster.png)
+<img width="1235" height="882" alt="image" src="https://github.com/user-attachments/assets/75736ed8-da6e-4e24-8cb0-fc1682cb9d4f" />
+
 
 ---
 
-### Step 7: Marker Gene Detection & Heatmap
+### Step 5: Marker Gene Detection & Heatmap
 
 ```r
 sce.markers <- FindAllMarkers(object = sce, test.use = "wilcox", only.pos = TRUE)
@@ -301,11 +288,12 @@ p_heatmap <- DoHeatmap(sce, features = top10$gene, size = 3)
 - Finds positive marker genes for every cluster with the Wilcoxon rank-sum test
 - Takes the top 10 markers per cluster and plots a heatmap of scaled expression
 
-![Marker heatmap](results/gse178481/09_marker_heatmap.png)
+<img width="659" height="884" alt="image" src="https://github.com/user-attachments/assets/14132da7-ccdb-4fc5-a4ac-07139b73d8b6" />
+
 
 ---
 
-### Step 8: Cell Type Marker Feature Plots
+### Step 6: Cell Type Marker Feature Plots
 
 Overlay canonical cell-type marker genes on the UMAP to interpret the clusters:
 
@@ -322,35 +310,38 @@ FeaturePlot(sce, features = c("SDC1", "CD38", "MZB1"))             # plasma cell
 
 **Epithelial cells (EPCAM, KRT19, KRT7, KRT18):**
 
-![Epithelial feature plot](results/gse178481/10_Epithelial_feature_plot.png)
+<img width="1323" height="881" alt="image" src="https://github.com/user-attachments/assets/805f0522-b6e6-4b84-9fb6-f7744343becd" />
+
 
 **T cells (CD3D, CD3E, CD8A, CD4):**
 
-![T cells feature plot](results/gse178481/10_T_cells_feature_plot.png)
+<img width="1323" height="882" alt="image" src="https://github.com/user-attachments/assets/b8eb4635-9e04-432b-a3b5-0139564a9849" />
+
 
 **Macrophages (CD68, CD14, APOE):**
 
-![Macrophage feature plot](results/gse178481/10_Macrophage_feature_plot.png)
+<img width="1324" height="884" alt="image" src="https://github.com/user-attachments/assets/3ad1d30d-3017-4f82-8254-e00bdcdb1249" />
 
 **Endothelial cells (ENG, VWF):**
 
-![Endothelial feature plot](results/gse178481/10_Endothelial_feature_plot.png)
+<img width="1323" height="883" alt="image" src="https://github.com/user-attachments/assets/211e0f6d-9dd8-4c1a-b28e-5c0c8537e3a4" />
 
 **NK cells (GNLY, NKG7, FGFBP2):**
 
-![NK cells feature plot](results/gse178481/10_NK_cells_feature_plot.png)
+<img width="1323" height="882" alt="image" src="https://github.com/user-attachments/assets/1277473a-dbbc-422b-975b-d2fb1ebce683" />
+
 
 **B cells (CD19, CD79A, MS4A1):**
 
-![B cells feature plot](results/gse178481/10_B_cells_feature_plot.png)
+<img width="1322" height="882" alt="image" src="https://github.com/user-attachments/assets/74673cb6-132d-4f11-92d5-7f8fd3248add" />
 
 **Fibroblasts (ACTA2, COL1A2):**
 
-![Fibroblast feature plot](results/gse178481/10_Fibroblast_feature_plot.png)
+<img width="1323" height="882" alt="image" src="https://github.com/user-attachments/assets/18e7198b-1da9-4de8-8a35-ec4090411c3f" />
 
 **Plasma cells (SDC1, CD38, MZB1):**
 
-![Plasma cells feature plot](results/gse178481/10_Plasma_feature_plot.png)
+<img width="1323" height="883" alt="image" src="https://github.com/user-attachments/assets/3e2b1dce-e22d-4c77-a698-26171996e810" />
 
 ---
 
