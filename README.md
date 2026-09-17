@@ -182,6 +182,13 @@ qc_result <- FastSeuratCellQuality(
   percent.mt.num = 15
 )
 sce <- qc_result$sce
+
+# QC violin BEFORE filtering — use the unfiltered object returned by the wrapper
+p_qc_before <- VlnPlot(qc_result$initial_sce,
+                       features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.ribo"),
+                       pt.size = 0.1, ncol = 2)
+ggsave(file.path("results/gse178481", "01_qc_violin_before_filtering.pdf"),
+       p_qc_before, width = 12, height = 10)
 ```
 
 - Calculates mitochondrial gene percentage (`^MT-`)
