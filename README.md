@@ -206,21 +206,28 @@ result <- FastSeuratRNA(
   nfeatures = 2000,
   resolution = 0.8,
   harmony = FALSE,       # ！Notably,As the present dataset comprises only a single sample, harmony integration was not performed. For datasets containing multiple samples, harmony = TURE
-  doublet = TURE,       
+  doublet = FALSE,       
   cellCycle = TRUE,
   isMarkers = TRUE,
   algorithm = 3          
 )
 sce         <- result$sce
+# Marker genes identified inside FastSeuratRNA()
 sce.markers <- result$gene.markers
-# Highly variable features
-top10 <- head(VariableFeatures(sce), 10)
-p_hvg <- LabelPoints(plot = VariableFeaturePlot(sce), points = top10, repel = TRUE)
 
-# Elbow plot (returned by the wrapper)
+# Highly variable features
+top10_hvg <- head(VariableFeatures(sce), 10)
+
+p_hvg <- LabelPoints(
+  plot = VariableFeaturePlot(sce),
+  points = top10_hvg,
+  repel = TRUE
+)
+
+# Elbow plot
 result$e
 
-# PCA (PC1 vs PC2), UMAP, tSNE
+# PCA, UMAP and tSNE
 DimPlot(sce, reduction = "pca", dims = c(1, 2))
 DimPlot(sce, reduction = "umap")
 DimPlot(sce, reduction = "tsne")
@@ -273,17 +280,28 @@ Checks that no cluster has suspiciously high mitochondrial content or extreme fe
 ### Step 5: Marker Gene Detection & Heatmap
 
 ```r
-sce.markers <- FindAllMarkers(object = sce, test.use = "wilcox", only.pos = TRUE)
+# Marker genes were already identified in Step 3
+# and stored in sce.markers
 
-top10 <- sce.markers %>%
+top10_markers <- sce.markers %>%
   group_by(cluster) %>%
-  slice_max(avg_log2FC, n = 10)
+  slice_max(
+    order_by = avg_log2FC,
+    n = 10,
+    with_ties = FALSE
+  )
 
-p_heatmap <- DoHeatmap(sce, features = top10$gene, size = 3)
+p_heatmap <- DoHeatmap(
+  sce,
+  features = unique(top10_markers$gene),
+  size = 3
+)
+
+p_heatmap
 ```
 
-- Finds positive marker genes for every cluster with the Wilcoxon rank-sum test
-- Takes the top 10 markers per cluster and plots a heatmap of scaled expression
+-Marker genes were identified in Step 3 by FastSeuratRNA() using FindAllMarkers().
+-This step selects the top 10 marker genes for each cluster based on avg_log2FC and visualizes their scaled expression using DoHeatmap().
 
 <img width="659" height="884" alt="image" src="https://github.com/user-attachments/assets/14132da7-ccdb-4fc5-a4ac-07139b73d8b6" />
 
